@@ -88,6 +88,20 @@
   }
   #status { margin-top: 14px; font-size: 14px; color: var(--muted); min-height: 18px; }
   #status.error { color: #c0392b; }
+
+  #qrBox {
+    margin-top: 16px;
+    display: flex;
+    justify-content: center;
+  }
+  #qrBox svg {
+    width: 180px;
+    height: 180px;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e5e5e5;
+    padding: 10px;
+  }
 </style>
 </head>
 <body>
@@ -106,9 +120,11 @@
         <input id="shortOut" type="text" readonly>
         <button class="copy-btn" id="copyBtn">Скопировать</button>
       </div>
+      <div id="qrBox"></div>
     </div>
   </div>
 
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 <script>
   const BASE_URL = "https://munoret-prog.github.io/smart-key-activate/";
 
@@ -117,6 +133,16 @@
   const statusEl = document.getElementById("status");
   const shortOut = document.getElementById("shortOut");
   const copyBtn = document.getElementById("copyBtn");
+  const qrBox = document.getElementById("qrBox");
+
+  function renderQr(url) {
+    qrBox.innerHTML = "";
+    if (!url) return;
+    const qr = qrcode(0, "M");
+    qr.addData(url);
+    qr.make();
+    qrBox.innerHTML = qr.createSvgTag({ scalable: true });
+  }
 
   function setStatus(text, isError) {
     statusEl.textContent = text || "";
@@ -135,6 +161,7 @@
     }
 
     setStatus("Сокращаю…");
+    qrBox.innerHTML = "";
     genBtn.disabled = true;
 
     try {
@@ -145,6 +172,7 @@
       if (!shortUrl.startsWith("http")) throw new Error("Не удалось сократить");
 
       shortOut.value = shortUrl;
+      renderQr(shortUrl);
       setStatus("Готово");
     } catch (err) {
       setStatus("Не получилось: " + err.message, true);
