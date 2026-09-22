@@ -83,6 +83,19 @@
     color: var(--muted);
     line-height: 1.5;
   }
+  #qrBox {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  #qrBox svg {
+    width: 180px;
+    height: 180px;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e5e5e5;
+    padding: 10px;
+  }
 </style>
 </head>
 <body>
@@ -93,22 +106,29 @@
 
     <div id="keyBox">—</div>
     <button id="copyBtn" disabled>Скопировать ключ</button>
+    <div id="qrBox"></div>
 
     <div class="hint">
-      Откройте приложение СмартРезерв → поле активации → вставьте скопированное значение.
+      Откройте приложение СмартРезерв → поле активации → вставьте скопированное значение (или отсканируйте QR, если приложение поддерживает сканер).
     </div>
   </div>
 
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 <script>
   const params = new URLSearchParams(window.location.search);
   const key = params.get("key");
 
   const keyBox = document.getElementById("keyBox");
   const copyBtn = document.getElementById("copyBtn");
+  const qrBox = document.getElementById("qrBox");
 
   if (key) {
     keyBox.textContent = key;
     copyBtn.disabled = false;
+    const qr = qrcode(0, "M");
+    qr.addData(key);
+    qr.make();
+    qrBox.innerHTML = qr.createSvgTag({ scalable: true });
   } else {
     keyBox.textContent = "Ключ не передан — проверьте ссылку";
     keyBox.classList.add("empty");
